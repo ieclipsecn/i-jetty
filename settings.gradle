@@ -1,0 +1,10 @@
+include ':i-jetty-server'
+include ':i-jetty-ui'
+project(':i-jetty-server').projectDir = new File(rootDir, 'i-jetty/i-jetty-server')
+project(':i-jetty-ui').projectDir = "$rootDir/i-jetty/i-jetty-ui" as File
+
+include ':console-apk'
+project(':console-apk').projectDir = "$rootDir/console/apk" as File
+
+include ':console-webapp'
+project(':console-webapp').projectDir = "$rootDir/console/webapp" as File

@@ -1,0 +1,82 @@
+apply plugin: 'war'
+//apply plugin: 'com.android.application'
+//android {
+//    compileSdkVersion Integer.parseInt(SDK_COMPILE)
+//    buildToolsVersion SDK_BUILD
+//}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('i-jetty/i-jetty-ui/local.properties').newDataInputStream())
+ext {
+
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+
+task explodedWar(type: Copy) {
+    into "$buildDir/exploded"
+    with war
+}
+
+war {
+    doFirst {
+        dx
+    }
+}
+
+tasks.withType(org.gradle.api.tasks.bundling.War) {
+
+}
+
+jar.enabled = true
+description = 'I-Jetty :: Console Webapp'
+dependencies {
+    compile "org.eclipse.jetty:jetty-util:${jettyVersion}"
+    compile "org.eclipse.jetty:jetty-servlets:${jettyVersion}"
+    providedCompile group: 'com.google.android', name: 'android', version: '1.6_r2'
+    providedCompile "org.mortbay.jetty:servlet-api:${servletVersion}"
+}
+
+// task to extract dependencies
+task unpack(type: Copy) {
+    def spec = new Spec<Dependency>() {
+        @Override
+        boolean isSatisfiedBy(Dependency element) {
+            return configurations.compile.dependencies.contains(element)
+        }
+    }
+    configurations.compile.resolvedConfiguration.getFiles(spec).each {
+        from zipTree(it)
+    }
+    into "$buildDir/unpacked"
+}
+
+
+task dx(type: org.gradle.api.tasks.Exec, dependsOn: unpack) {
+    def dxJar = new File(properties.getProperty("sdk.dir") + "/build-tools/" + SDK_BUILD + "/lib/dx.jar");
+    copy {
+        from dxJar.absolutePath
+        into "${project.buildDir}"
+    }
+    println(dxJar)
+    workingDir "${project.buildDir}"
+    def cmd = ['java', '-jar', 'dx.jar', '--dex', '--core-library', "--verbose", "--output=classes.dex",
+               "--positions=lines", sourceSets.main.output.classesDir, "${buildDir}/unpacked"]
+    commandLine cmd
+}
+
+task jarDex(type: Jar) {
+    destinationDir = file("${buildDir}/exploded/WEB-INF/lib/")
+    archiveName "classes.zip"
+    //from "${buildDir}"
+    includes ["${buildDir}/classes.dex"]
+}
+
+task hello << {
+    println(sourceSets.main.output.classesDir)
+    println("${env.android_home}")
+}

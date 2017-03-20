@@ -1,0 +1,11 @@
+description = 'I-Jetty :: Jetty Adaptations for Android'
+
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion Integer.parseInt(SDK_COMPILE)
+    buildToolsVersion SDK_BUILD
+}
+dependencies {
+    compile "org.eclipse.jetty:jetty-webapp:${jettyVersion}"
+    compile "org.eclipse.jetty:jetty-deploy:${jettyVersion}"
+}

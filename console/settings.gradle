@@ -1,0 +1,6 @@
+rootProject.name = 'console-parent'
+include ':console'
+include ':i-jetty-console-installer'
+
+project(':console').projectDir = "$rootDir/webapp" as File
+project(':i-jetty-console-installer').projectDir = "$rootDir/apk" as File

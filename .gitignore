@@ -6,3 +6,11 @@ target
 *.log
 *.patch
 *.diff
+.gradle
+bin
+gen
+.idea
+build
+*.iml
+gradlew
+gradlew.bat
